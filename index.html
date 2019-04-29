@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="/jq"></script>
+</head>
+
+<body>
+    <button id="btnLocation">获取当前位置的经纬度信息</button>
+    <button id="btnScan">扫一扫</button>
+    <button id="btnShare">分享到朋友圈</button>
+</body>
+<script>
+    $(document).ready(() => {
+        //签名
+        $.get('/sign').then((data) => {
+            //配置jssdk
+            wx.config({
+                debug: true,
+                appId: data.appId,
+                timestamp: data.timestamp,
+                nonceStr: data.nonceStr,
+                signature: data.signature,
+                jsApiList: ['getLocation', 'scanQRCode','onMenuShareTimeline']
+            });
+        })
+    })
+
+    $('#btnLocation').click(() => {
+        alert('按钮被按下了');
+        wx.getLocation({
+            type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+            error: function (e) { alert(e); },
+            success: function (res) {
+                var latitude = res.latitude;
+                alert('go' + latitude);
+            }
+        });
+    })
+
+    $('#btnScan').click(() => {
+        wx.scanQRCode({
+            needResult: 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode", "barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                alert(result);
+            }
+        });
+    });
+    $('#btnShare').click(() => {
+        wx.onMenuShareTimeline({
+            title: '51活动', // 分享标题
+            link: 'http://a7e8acc2.ngrok.io/index_location.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: 'http://www.angulartypescript.com/wp-content/uploads/2016/03/car1.jpg', // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+                alert('分享成功');
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+                alert('分享取消');
+            }
+        });
+    });
+    wx.ready((e, x) => {
+
+    })
+
+
+</script>
+
+</html>
